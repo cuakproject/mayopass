@@ -2,7 +2,7 @@
 let gamepassData = {};
 let resellerData = {};
 
-const API_URL = window.location.origin + "/api";
+const API_URL = "/api";
 
 // ==================== BACKEND API FUNCTIONS ====================
 async function fetchDataFromServer() {
