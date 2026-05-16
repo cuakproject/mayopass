@@ -488,7 +488,7 @@
             console.log('📥 Loading data from backend...');
             try {
                 updateLoadingProgress(30);
-                const response = await fetch('http://localhost:3000/api?action=getGamepassData');
+                fetch('/api?action=getGamepassData')
                 
                 updateLoadingProgress(65);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
