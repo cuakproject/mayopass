@@ -484,49 +484,55 @@
         }
 
         // ==================== DATA LOADING (FAST - pakai backend bukan Google Sheets) ====================
-        async function loadAllData() {
-            console.log('📥 Loading data from backend...');
-            try {
-                updateLoadingProgress(30);
-                fetch('/api?action=getGamepassData')
-                
-                updateLoadingProgress(65);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                updateLoadingProgress(85);
-
-                if (data.success && data.gamepassData) {
-                    const gamepassData = data.gamepassData;
-                    let resellerData = data.resellerData || {};
-
-                    if (Object.keys(resellerData).length === 0) {
-                        resellerData = {};
-                        Object.keys(gamepassData).forEach(name => {
-                            resellerData[name] = { rate: 90, items: { ...gamepassData[name].items } };
-                        });
-                    }
-
-                    localStorage.setItem('gamepassData', JSON.stringify(gamepassData));
-                    localStorage.setItem('resellerData', JSON.stringify(resellerData));
-                    updateLoadingProgress(100);
-                    console.log('✅ Data loaded:', Object.keys(gamepassData).length, 'gamepasses');
-                    return true;
-                }
-                throw new Error('API returned error');
-            } catch (error) {
-                console.warn('⚠️ Backend fetch failed, using cached data:', error.message);
-                // Fallback ke localStorage jika ada
-                const savedGamepass = localStorage.getItem('gamepassData');
-                if (savedGamepass) {
-                    updateLoadingProgress(100);
-                    console.log('🔄 Using cached data as fallback');
-                    return true;
-                }
-                updateLoadingProgress(100);
-                return false;
-            }
+       async function loadAllData() {
+    try {
+        console.log('📥 Loading data from backend...');
+        
+        // Panggil API Vercel (bukan localhost)
+        const response = await fetch('/api?action=getGamepassData');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Data berhasil diambil dari backend
+            window.gamepassData = data.gamepassData || {};
+            window.resellerData = data.resellerData || {};
+            
+            // Simpan ke localStorage sebagai cache
+            localStorage.setItem('gamepassData', JSON.stringify(window.gamepassData));
+            localStorage.setItem('resellerData', JSON.stringify(window.resellerData));
+            
+            console.log('✅ Data loaded from backend:', window.gamepassData);
+            return true;
+        } else {
+            throw new Error(data.error || 'Unknown error');
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Backend fetch failed, using cached data:', error.message);
+        
+        // Fallback ke localStorage
+        const cachedGamepass = localStorage.getItem('gamepassData');
+        const cachedReseller = localStorage.getItem('resellerData');
+        
+        if (cachedGamepass && cachedReseller) {
+            window.gamepassData = JSON.parse(cachedGamepass);
+            window.resellerData = JSON.parse(cachedReseller);
+            console.log('🔄 Using cached data from localStorage');
+        } else {
+            // Data kosong
+            window.gamepassData = {};
+            window.resellerData = {};
+            console.log('📭 No cached data available, starting empty');
+        }
+        
+        return false;
+    }
+}
 
         // Toggle Password Function
         document.getElementById('togglePassword').addEventListener('click', function() {
