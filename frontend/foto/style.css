@@ -1,0 +1,2205 @@
+:root {
+    --bg: #fef6f9;
+    --card: #ffffff;
+    --pink: #f9b4c7;
+    --pink-dark: #f184a0;
+    --text: #5c3b4e;
+    --muted: #8d7a85;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --shadow-hover: 0 4px 20px rgba(0,0,0,0.12);
+    --container: 1200px;
+    --gap: 1rem;
+    --success: #10b981;
+    --success-light: #a7f3d0;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --primary: #8a2be2;
+    --secondary: #ff69b4;
+    --light: #f8f9fa;
+    --dark: #343a40;
+}
+
+body.dark {
+    --bg: #1a1a1a;
+    --card: #2b2b2b;
+    --text: #f5f5f5;
+    --muted: #bbb;
+    --pink: #f57ca1;
+    --pink-dark: #ff9dbb;
+    --shadow: 0 2px 12px rgba(255,255,255,0.05);
+    --shadow-hover: 0 4px 20px rgba(255,255,255,0.1);
+    --success: #34d399;
+    --success-light: #a7f3d0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+    min-width: 280px;
+    padding-top: 50px; /* Sesuaikan dengan tinggi navbar */
+}
+
+/* ==================== NAVBAR STYLE DARI KODE 1 ==================== */
+.main-nav {
+    background: var(--card);
+    box-shadow: var(--shadow);
+    padding: clamp(0.3rem, 2vw, 0.75rem) 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    min-width: 280px;
+    width: 100%;
+}
+
+.nav-container {
+    max-width: min(95%, 1200px);
+    margin: 0 auto;
+    padding: 0 clamp(0.25rem, 2vw, 1rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(0.1rem, 1vw, 1rem);
+    flex-wrap: nowrap;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: clamp(4px, 1vw, 8px);
+    font-weight: 700;
+    font-size: clamp(0.8rem, 3vw, 1.1rem);
+    flex-shrink: 1;
+    white-space: nowrap;
+    min-width: 0;
+    color: var(--text);
+}
+
+.nav-user {
+    color: var(--text);
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.theme-toggle {
+    background: var(--pink);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: clamp(2px, 1vw, 6px) clamp(4px, 1.5vw, 10px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: clamp(0.6rem, 2vw, 0.9rem);
+    font-family: inherit;
+    flex-shrink: 0;
+    min-width: clamp(24px, 6vw, 40px);
+}
+
+.theme-toggle:hover {
+    background: var(--pink-dark);
+}
+
+.logout-btn {
+    background: var(--pink);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: clamp(2px, 1vw, 6px) clamp(4px, 1.5vw, 10px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: clamp(0.6rem, 2vw, 0.9rem);
+    font-family: inherit;
+    flex-shrink: 0;
+    min-width: clamp(24px, 6vw, 40px);
+    margin-right: 10px;
+}
+
+.logout-btn:hover {
+    background: var(--pink-dark);
+}
+
+/* Responsive untuk mobile kecil */
+@media (max-width: 480px) {
+    .nav-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .nav-logo {
+        order: 1;
+    }
+    
+    .nav-user {
+        order: 2;
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+/* ==================== CONTAINER & LAYOUT ==================== */
+.container {
+    max-width: min(95%, 1200px);
+    margin: 0 auto;
+    padding: 0 clamp(0.5rem, 3vw, 1rem);
+}
+
+/* ==================== NAV TABS STYLE ==================== */
+.nav-tabs {
+    display: flex;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    padding: 8px;
+    margin: 1rem auto 2rem auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    max-width: fit-content;
+    gap: 8px;
+}
+
+.nav-tab {
+    padding: 12px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    white-space: nowrap;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.nav-tab.active {
+    background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+}
+
+.nav-tab:hover:not(.active) {
+    background: rgba(255, 107, 157, 0.1);
+    color: var(--text);
+}
+
+/* Dark mode adjustments untuk nav-tabs */
+body.dark .nav-tabs {
+    background: rgba(45, 45, 45, 0.95);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+body.dark .nav-tab {
+    color: var(--text);
+}
+
+body.dark .nav-tab:hover:not(.active) {
+    background: rgba(255, 107, 157, 0.2);
+    color: var(--text);
+}
+
+/* ==================== TAB CONTENT ==================== */
+.tab-content {
+    display: none;
+    background: var(--card);
+    padding: clamp(1rem, 3vw, 2rem);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: clamp(1rem, 3vw, 2rem);
+    min-height: 400px;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: clamp(1rem, 3vw, 2rem);
+    flex-wrap: wrap;
+    gap: clamp(1rem, 3vw, 1.5rem);
+}
+
+.tab-header h2 {
+    color: var(--text);
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ==================== SEARCH BOX ==================== */
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+    max-width: 400px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem);
+    padding-right: clamp(2.5rem, 6vw, 3rem);
+    border: 2px solid var(--pink);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--pink-dark);
+    box-shadow: 0 0 0 3px rgba(249, 180, 199, 0.2);
+}
+
+.search-box input::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+}
+
+/* ==================== TEMPLATE CARDS ==================== */
+.template-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--pink);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.template-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.template-card h3 {
+    margin-bottom: clamp(0.75rem, 2vw, 1rem);
+    color: var(--pink-dark);
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-weight: 600;
+}
+
+.template-content {
+    background: var(--bg);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border-radius: 8px;
+    white-space: pre-line;
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    line-height: 1.6;
+    color: var(--text);
+    border: 1px solid var(--pink);
+    transition: all 0.3s ease;
+    min-height: 80px;
+}
+
+.template-card:hover .template-content {
+    border-color: var(--pink-dark);
+    background: rgba(249, 180, 199, 0.05);
+}
+
+/* ==================== BUTTONS ==================== */
+.btn {
+    display: inline-block;
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem);
+    background: var(--pink);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    font-family: inherit;
+}
+
+.btn:hover {
+    background: var(--pink-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-copy {
+    background: var(--success);
+    margin-top: clamp(0.75rem, 2vw, 1rem);
+}
+
+.btn-copy:hover {
+    background: var(--success);
+    filter: brightness(1.1);
+}
+
+.btn-copy.copied {
+    background: var(--success);
+    transform: scale(0.98);
+}
+
+/* ==================== FORM ELEMENTS ==================== */
+.form-group {
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: clamp(0.25rem, 1vw, 0.5rem);
+    font-weight: 500;
+    color: var(--text);
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+}
+
+.form-control {
+    width: 100%;
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
+    border: 1px solid var(--pink);
+    border-radius: var(--radius);
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    background: var(--bg);
+    color: var(--text);
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--pink-dark);
+    box-shadow: 0 0 0 3px rgba(249, 180, 199, 0.2);
+}
+
+/* ==================== QUICK ACTIONS ==================== */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(150px, 20vw, 200px), 1fr));
+    gap: clamp(1rem, 3vw, 1.5rem);
+    margin-bottom: clamp(1.5rem, 4vw, 2rem);
+}
+
+.action-card {
+    background: var(--card);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border-radius: var(--radius);
+    text-align: center;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--pink);
+}
+
+.action-card i {
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+    margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
+    color: var(--pink);
+    transition: all 0.3s ease;
+}
+
+.action-card:hover i {
+    color: var(--pink-dark);
+    transform: scale(1.1);
+}
+
+.action-card h3 {
+    margin-bottom: clamp(0.25rem, 1vw, 0.5rem);
+    color: var(--text);
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    font-weight: 600;
+}
+
+.action-card p {
+    color: var(--muted);
+    font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+    line-height: 1.4;
+}
+
+/* ==================== CALCULATOR RESULTS ==================== */
+#hasil-hitung,
+#hasil-tanggal,
+#hasil-tax {
+    background: var(--bg);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border-radius: var(--radius);
+    border: 1px solid var(--pink);
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    line-height: 1.6;
+    color: var(--text);
+}
+
+/* ==================== FOOTER ==================== */
+footer {
+    text-align: center;
+    padding: clamp(1rem, 3vw, 2rem) clamp(0.5rem, 2vw, 1rem);
+    margin-top: clamp(2rem, 6vw, 4rem);
+    color: var(--muted);
+    font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ==================== TOAST NOTIFICATION ==================== */
+.toast {
+    position: fixed;
+    bottom: clamp(1rem, 3vw, 1.5rem);
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--success);
+    color: white;
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem);
+    border-radius: var(--radius);
+    font-weight: 500;
+    box-shadow: var(--shadow-hover);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    text-align: center;
+    max-width: min(90%, 300px);
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* ==================== TAX CALCULATOR STYLES ==================== */
+.tax-calculator {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.tax-input-section {
+    background: var(--bg);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    border: 2px solid var(--pink);
+}
+
+.tax-type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.tax-option {
+    position: relative;
+}
+
+.tax-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.tax-option-label {
+    display: block;
+    padding: 1rem;
+    background: var(--card);
+    border: 2px solid var(--pink);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    color: var(--text);
+}
+
+.tax-option input[type="radio"]:checked + .tax-option-label {
+    background: var(--pink);
+    color: white;
+    border-color: var(--pink-dark);
+}
+
+.tax-option-label:hover {
+    border-color: var(--pink-dark);
+    transform: translateY(-2px);
+}
+
+.tax-option-title {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.tax-info {
+    background: var(--bg);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    border: 2px solid var(--pink);
+}
+
+.info-card h4 {
+    color: var(--pink-dark);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.info-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info-card li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.info-card li:last-child {
+    border-bottom: none;
+}
+
+.info-card strong {
+    color: var(--pink-dark);
+}
+
+/* Style untuk hasil perhitungan tax */
+.result-item {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--success);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.result-item .result-label {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.result-item .result-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+}
+
+.result-item .result-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+.tax-tips {
+    background: rgba(249, 180, 199, 0.1);
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--pink);
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    text-align: center;
+    color: var(--text);
+}
+
+.tax-tips strong {
+    color: var(--pink-dark);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 0 1rem;
+    }
+    
+    .nav-tabs {
+        flex-direction: column;
+    }
+    
+    .nav-tab {
+        min-width: auto;
+    }
+    
+    .tab-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .search-box {
+        min-width: 100%;
+        max-width: 100%;
+    }
+    
+    .quick-actions {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+    
+    .tax-type-selector {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding-top: 55px;
+    }
+    
+    .main-nav {
+        height: 55px;
+        padding: 0.5rem 0;
+    }
+    
+    .container {
+        padding: 0 0.5rem;
+    }
+    
+    .nav-logo {
+        font-size: 1rem;
+    }
+    
+    .tab-content {
+        padding: 1rem;
+    }
+    
+    .template-card {
+        padding: 1rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-card {
+        padding: 1rem;
+    }
+    
+    .template-content {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+    
+    .btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        padding: 10px;
+    }
+}
+
+/* ==================== DARK MODE IMPROVEMENTS ==================== */
+body.dark .template-content {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark .form-control {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--pink);
+}
+
+body.dark .search-box input {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark #hasil-hitung,
+body.dark #hasil-tanggal,
+body.dark #hasil-tax {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Pastikan footer selalu di bawah */
+.container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* ==================== PRICE LIST STYLES ==================== */
+.price-list {
+    font-size: 0.9rem;
+}
+
+.price-category h5 {
+    color: var(--pink-dark);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.price-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 5px;
+}
+
+.price-item {
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--text);
+}
+
+.price-item strong {
+    color: var(--pink-dark);
+}
+
+/* Dark mode adjustments */
+body.dark .price-item {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Radio button labels untuk robux type */
+.tax-option-label small {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container .form-control {
+    padding-right: 45px; /* Space untuk tombol toggle */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-password:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.toggle-icon {
+    font-size: 1rem;
+    user-select: none;
+}
+
+/* Dark mode adjustment */
+body.dark .toggle-password:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== PIN PROTECTION STYLES ==================== */
+#vilog-pin-protection {
+    width: 100%;
+}
+
+.pin-protection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem;
+}
+
+.pin-box {
+    background: var(--card);
+    padding: 2.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hover);
+    border: 2px solid var(--pink);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.pin-box h3 {
+    color: var(--pink-dark);
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.pin-box p {
+    color: var(--muted);
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+}
+
+.pin-box .form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.pin-box .password-container {
+    position: relative;
+}
+
+.pin-box .form-control {
+    padding-right: 50px;
+    width: 100%;
+}
+
+.pin-box .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 1.2rem;
+}
+
+.pin-box .btn {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.pin-box .error-message {
+    background: rgba(220, 53, 69, 0.1);
+    color: var(--danger);
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Copy Result Button */
+.copy-result-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--success);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.copy-result-btn:hover {
+    background: var(--success);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+/* Pastikan container hasil memiliki position relative */
+#hasil-tanggal,
+#hasil-hitung,
+#hasil-tax {
+    position: relative;
+    padding-top: 50px;
+}
+
+.tab-content#giftgamepass {
+    display: none;
+}
+
+.tab-content#giftgamepass.active {
+    display: block;
+}
+
+/* ==================== GIFT GAMEPASS STYLES ==================== */
+
+/* Popup Styles */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background: var(--card);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hover);
+    border: 2px solid var(--pink);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.popup-title {
+    color: var(--pink-dark);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.close-popup {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--muted);
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-popup:hover {
+    color: var(--danger);
+}
+
+/* Gamepass Card Styles */
+.gamepass-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--pink);
+}
+
+.gamepass-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.gamepass-rate {
+    color: var(--pink-dark);
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: rgba(249, 180, 199, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.gamepass-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-edit, .btn-delete {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-edit {
+    background: var(--warning);
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #e0a800;
+}
+
+.btn-delete {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+}
+
+/* Items Grid Styles - FIXED LAYOUT */
+.items-grid {
+    display: grid;
+    grid-template-columns: 1fr 120px 120px;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+}
+
+.item-row {
+    display: contents;
+}
+
+.item-name {
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    word-break: break-word;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+.item-robux {
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--pink-dark);
+    font-size: 0.9rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-price {
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: 6px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--success);
+    font-size: 0.9rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* ==================== IMPROVED GIFT GAMEPASS LAYOUT ==================== */
+
+/* Grid Header - IMPROVED */
+.grid-header {
+    display: grid;
+    grid-template-columns: 1fr 120px 120px;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem 0.5rem;
+    background: var(--pink);
+    border-radius: 6px;
+    font-weight: 600;
+    color: white;
+    font-size: 0.9rem;
+    width: 100%;
+    text-align: center; /* Semua header di tengah */
+}
+
+.header-name,
+.header-robux,
+.header-price {
+    text-align: center; /* Semua header di tengah */
+}
+
+/* Items Grid - IMPROVED */
+.items-grid {
+    display: grid;
+    grid-template-columns: 1fr 120px 120px;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+}
+
+.item-row {
+    display: contents;
+}
+
+.item-name,
+.item-robux,
+.item-price {
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: 6px;
+    text-align: center; /* Semua konten di tengah */
+    font-size: 0.9rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Konten di tengah secara vertikal dan horizontal */
+    word-break: break-word;
+}
+
+.item-name {
+    font-weight: 500;
+}
+
+.item-robux {
+    font-weight: 600;
+    color: var(--pink-dark);
+}
+
+.item-price {
+    font-weight: 600;
+    color: var(--success);
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 768px) {
+    .grid-header,
+    .items-grid {
+        grid-template-columns: 1fr 80px 80px;
+        font-size: 0.8rem;
+    }
+    
+    .item-name,
+    .item-robux,
+    .item-price {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .grid-header,
+    .items-grid {
+        grid-template-columns: 1fr 70px 70px;
+        gap: 0.25rem;
+    }
+    
+    .item-name,
+    .item-robux,
+    .item-price {
+        padding: 0.4rem;
+        font-size: 0.75rem;
+        min-height: 36px;
+    }
+}
+
+/* Admin Controls */
+.admin-controls {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: 2px solid var(--pink);
+}
+
+.admin-controls h3 {
+    color: var(--pink-dark);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.admin-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* ==================== SELECTED ITEMS STYLES - SAMA PERSIS ==================== */
+.selected-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--pink);
+}
+
+.selected-item-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.selected-item-robux {
+    margin: 0 1rem;
+    color: var(--pink-dark);
+    font-weight: 600;
+    min-width: 80px;
+    text-align: right;
+}
+
+.remove-item {
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/* Dark mode adjustments - SAMA PERSIS */
+body.dark .selected-item {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark .selected-item-name {
+    color: var(--text);
+}
+
+body.dark .selected-item-robux {
+    color: var(--pink-dark);
+}
+
+/* Items List Grid */
+#items-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.item-option {
+    padding: 1rem;
+    background: var(--card);
+    border: 2px solid var(--pink);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.item-option:hover {
+    background: var(--pink);
+    transform: translateY(-2px);
+}
+
+.item-option-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.item-option-robux {
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+
+/* Dropdown Styles */
+select.form-control {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--pink);
+    border-radius: var(--radius);
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23f184a0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+}
+
+select.form-control:focus {
+    outline: none;
+    border-color: var(--pink-dark);
+    box-shadow: 0 0 0 3px rgba(249, 180, 199, 0.2);
+}
+
+select.form-control option {
+    background: var(--card);
+    color: var(--text);
+    padding: 0.5rem;
+}
+
+/* Item Input Rows */
+.item-input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    align-items: center;
+}
+
+.item-input-row input {
+    flex: 1;
+}
+
+.item-input-row input[type="number"] {
+    width: 100px;
+}
+
+.remove-item-btn {
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem;
+    cursor: pointer;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Scrollbar Styles */
+.popup-content::-webkit-scrollbar,
+.template-content::-webkit-scrollbar,
+#items-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.popup-content::-webkit-scrollbar-track,
+.template-content::-webkit-scrollbar-track,
+#items-list::-webkit-scrollbar-track {
+    background: var(--bg);
+    border-radius: 4px;
+}
+
+.popup-content::-webkit-scrollbar-thumb,
+.template-content::-webkit-scrollbar-thumb,
+#items-list::-webkit-scrollbar-thumb {
+    background: var(--pink);
+    border-radius: 4px;
+}
+
+.popup-content::-webkit-scrollbar-thumb:hover,
+.template-content::-webkit-scrollbar-thumb:hover,
+#items-list::-webkit-scrollbar-thumb:hover {
+    background: var(--pink-dark);
+}
+
+body.dark .popup-content::-webkit-scrollbar-track,
+body.dark .template-content::-webkit-scrollbar-track,
+body.dark #items-list::-webkit-scrollbar-track {
+    background: var(--card);
+}
+
+/* Gamepass Card Container */
+.gamepass-card {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* ==================== SUBTABS STYLES ==================== */
+.sub-nav-tabs {
+    display: flex;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    padding: 8px;
+    margin: 0 0 2rem 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    max-width: fit-content;
+    gap: 8px;
+}
+
+.sub-nav-tab {
+    padding: 12px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    white-space: nowrap;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.sub-nav-tab.active {
+    background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+}
+
+.sub-nav-tab:hover:not(.active) {
+    background: rgba(255, 107, 157, 0.1);
+    color: var(--text);
+}
+
+.subtab-content {
+    display: none;
+}
+
+.subtab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Dark mode adjustments */
+body.dark .sub-nav-tabs {
+    background: rgba(45, 45, 45, 0.95);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+body.dark .sub-nav-tab {
+    color: var(--text);
+}
+
+body.dark .sub-nav-tab:hover:not(.active) {
+    background: rgba(255, 107, 157, 0.2);
+    color: var(--text);
+}
+
+/* ==================== GAMEPASS LAYOUT STYLES ==================== */
+.gamepass-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    min-height: 600px;
+}
+
+/* Sidebar Daftar Map */
+.gamepass-sidebar {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+}
+
+.sidebar-header {
+    background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+    padding: 1.5rem;
+    color: white;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.map-list {
+    padding: 1rem 0;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.map-item {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.map-item:hover {
+    background: rgba(255, 107, 157, 0.1);
+}
+
+.map-item.active {
+    background: rgba(255, 107, 157, 0.15);
+    border-left-color: var(--pink);
+    color: var(--pink-dark);
+    font-weight: 600;
+}
+
+.map-name {
+    flex: 1;
+    font-size: 0.95rem;
+}
+
+.map-count {
+    background: var(--pink);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Content Kanan untuk Kalkulator */
+.gamepass-content {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+}
+
+.content-header {
+    background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+    padding: 1.5rem;
+    color: white;
+}
+
+.content-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.calculator-container {
+    padding: 2rem;
+}
+
+/* Admin Actions Header */
+.admin-actions-header {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Items List untuk Kalkulator */
+#items-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.item-option {
+    background: var(--bg);
+    border: 2px solid var(--pink);
+    border-radius: var(--radius);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.item-option:hover {
+    background: var(--pink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.item-option:hover .item-option-name,
+.item-option:hover .item-option-robux {
+    color: white;
+}
+
+.item-option-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text);
+    transition: color 0.3s ease;
+}
+
+.item-option-robux {
+    color: var(--muted);
+    font-size: 0.85rem;
+    transition: color 0.3s ease;
+}
+
+/* Selected Items */
+.selected-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--pink);
+    transition: all 0.3s ease;
+}
+
+.selected-item:hover {
+    border-color: var(--pink-dark);
+    box-shadow: var(--shadow);
+}
+
+.selected-item-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.selected-item-robux {
+    margin: 0 1rem;
+    color: var(--pink-dark);
+    font-weight: 600;
+    min-width: 80px;
+    text-align: right;
+}
+
+.remove-item {
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.remove-item:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+/* ==================== PERBAIKAN CUSTOM ITEM INPUT ==================== */
+.custom-item-input {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch; /* Ubah dari center ke stretch */
+}
+
+.custom-item-input .form-control {
+    flex: 1;
+    height: 45px; /* Tambahkan height tetap */
+}
+
+.custom-item-input .form-control:last-of-type {
+    width: 120px;
+    flex: none;
+}
+
+.custom-item-input .btn-small {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    height: 45px; /* Samakan height dengan input */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+/* Pastikan tombol calculate bisa diklik */
+.btn-calculate {
+    background: linear-gradient(135deg, var(--success), #0da768);
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-calculate:hover {
+    background: linear-gradient(135deg, #0da768, var(--success));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-calculate:active {
+    transform: translateY(0);
+}
+
+/* Pastikan tombol tidak disabled */
+.btn-calculate:disabled {
+    background: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-calculate:disabled:hover {
+    background: var(--muted);
+    transform: none;
+    box-shadow: none;
+}
+
+/* Dark mode adjustments */
+body.dark .gamepass-sidebar,
+body.dark .gamepass-content {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+body.dark .item-option {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark .selected-item {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .gamepass-layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .custom-item-input {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .custom-item-input .form-control:last-of-type {
+        width: 100%;
+    }
+}
+
+/* Style untuk tampilan saat belum memilih map */
+#no-map-selected {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+}
+
+#no-map-selected h3 {
+    margin-bottom: 1rem;
+    color: var(--muted);
+}
+
+#no-map-selected p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* ==================== UPDATED MAP ITEM STYLES ==================== */
+.map-item {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.map-item:hover {
+    background: rgba(255, 107, 157, 0.1);
+}
+
+.map-item.active {
+    background: rgba(255, 107, 157, 0.15);
+    border-left-color: var(--pink);
+    color: var(--pink-dark);
+    font-weight: 600;
+}
+
+.map-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.map-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-rate {
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: rgba(249, 180, 199, 0.2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.map-actions {
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.map-item:hover .map-actions {
+    opacity: 1;
+}
+
+.btn-edit-small, .btn-delete-small {
+    padding: 0.3rem 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.3s ease;
+}
+
+.btn-edit-small {
+    background: var(--warning);
+    color: white;
+}
+
+.btn-edit-small:hover {
+    background: #e0a800;
+    transform: scale(1.1);
+}
+
+.btn-delete-small {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-delete-small:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+/* ==================== UPDATED COPY BUTTON STYLES ==================== */
+.copy-result-btn {
+    background: var(--success);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.copy-result-btn:hover {
+    background: var(--success);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+/* Pastikan container hasil memiliki position relative */
+#calculation-result {
+    position: relative;
+    padding-top: 20px;
+}
+
+/* Style untuk tombol reset */
+.btn-reset {
+    background: var(--warning);
+    color: white;
+}
+
+.btn-reset:hover {
+    background: #e0a800;
+    filter: brightness(1.1);
+}
+
+/* ==================== IMPROVED CALCULATION RESULT STYLES ==================== */
+.calculation-result-card {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    border: 2px solid var(--pink);
+    box-shadow: var(--shadow);
+    position: relative;
+    padding-top: 60px; /* Space for buttons */
+}
+
+.calculation-result-header {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.calc-detail-section {
+    margin-bottom: 1.5rem;
+}
+
+.calc-map-header {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--pink-dark);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(249, 180, 199, 0.3);
+}
+
+.calc-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.calc-detail-row:last-child {
+    border-bottom: none;
+}
+
+.calc-item-name {
+    flex: 1;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.calc-item-calc {
+    font-weight: 500;
+    color: var(--muted);
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.calc-total-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 3px solid var(--pink);
+}
+
+.calc-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.calc-total-label {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.calc-total-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--success);
+}
+
+.calc-total-info {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+/* Button Styles untuk Calculation Result */
+.calc-btn-reset {
+    background: var(--warning);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.calc-btn-reset:hover {
+    background: #e0a800;
+    transform: translateY(-1px);
+}
+
+.calc-btn-copy {
+    background: var(--success);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.calc-btn-copy:hover {
+    background: var(--success);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.calc-btn-copy.copied {
+    background: var(--success);
+    transform: scale(0.98);
+}
+
+/* Dark mode adjustments */
+body.dark .calc-detail-row {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.dark .calculation-result-card {
+    background: var(--card);
+}
+
+/* Items List untuk Reseller */
+#reseller-items-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#reseller-items-list .item-option {
+    background: var(--card);
+    border: 2px solid var(--pink);
+    border-radius: var(--radius);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+#reseller-items-list .item-option:hover {
+    background: var(--pink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+#reseller-items-list .item-option:hover .item-option-name,
+#reseller-items-list .item-option:hover .item-option-robux {
+    color: white;
+}
+
+#reseller-items-list .item-option-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text);
+    transition: color 0.3s ease;
+    font-size: 0.9rem;
+}
+
+#reseller-items-list .item-option-robux {
+    color: var(--muted);
+    font-size: 0.85rem;
+    transition: color 0.3s ease;
+}
+
+/* Custom Item Input untuk Reseller */
+#reseller-items-section .custom-item-input {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#reseller-items-section .custom-item-input .form-control {
+    flex: 1;
+}
+
+#reseller-items-section .custom-item-input .form-control:last-of-type {
+    width: 120px;
+    flex: none;
+}
+
+/* Selected Items untuk Reseller */
+#reseller-selected-items .selected-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--pink);
+    transition: all 0.3s ease;
+}
+
+#reseller-selected-items .selected-item:hover {
+    border-color: var(--pink-dark);
+    box-shadow: var(--shadow);
+}
+
+#reseller-selected-items .selected-item-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text);
+}
+
+#reseller-selected-items .selected-item-robux {
+    margin: 0 1rem;
+    color: var(--pink-dark);
+    font-weight: 600;
+    min-width: 80px;
+    text-align: right;
+}
+
+#reseller-selected-items .remove-item {
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#reseller-selected-items .remove-item:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+/* ==================== STYLE UNTUK FOTO MAYO ==================== */
+.mayo-icon {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.mayo-icon:hover {
+    transform: scale(1.05);
+}
+
+/* Dark mode adjustment */
+body.dark .mayo-icon {
+    box-shadow: 0 4px 12px rgba(255,255,255,0.1);
+}

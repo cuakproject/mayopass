@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mayoblox Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Favicon -->
+    <link rel="icon" href="foto/mayicon.png" type="image/png">
+    <link rel="shortcut icon" href="foto/mayicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="foto/mayicon.png">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    🌸 Mayoblox Admin Tools by Dits
+                </div>
+                <div class="nav-user">
+                    Halo,<span id="userDisplayName">User</span>! 👋
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                    <div class="theme-toggle-container">
+                        <button class="theme-toggle" id="theme-toggle">
+                            <span id="theme-icon">🌙</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Tab Selection -->
+        <div class="nav-tabs">    
+            <div class="nav-tab active" data-tab="templates">Template Pesan</div>
+            <div class="nav-tab" data-tab="panduan">Panduan</div>
+            <div class="nav-tab" data-tab="formulir">Formulir</div>
+            <div class="nav-tab" data-tab="tools">Tools</div>
+            <div class="nav-tab" data-tab="vilog">Vilog</div>
+            <div class="nav-tab" data-tab="giftgamepass">Gift Gamepass</div>
+            <div class="nav-tab" data-tab="reseller">Reseller</div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Tab Template Pesan -->
+            <div class="tab-content active" id="templates">
+                <div class="tab-header">
+                    <h2>Template Pesan Cepat</h2>
+                    <div class="search-box">
+                        <input type="text" id="template-search" placeholder="🔍 Cari template...">
+                    </div>
+                </div>
+                <div id="templates-container"></div>
+            </div>
+            
+            <!-- Tab Panduan -->
+            <div class="tab-content" id="panduan">
+                <div class="tab-header">
+                    <h2>Panduan dan Informasi</h2>
+                    <div class="search-box">
+                        <input type="text" id="panduan-search" placeholder="🔍 Cari panduan...">
+                    </div>
+                </div>
+                <div id="panduan-container"></div>
+            </div>
+            
+            <!-- Tab Formulir -->
+            <div class="tab-content" id="formulir">
+                <div class="tab-header">
+                    <h2>Formulir Cepat</h2>
+                    <div class="search-box">
+                        <input type="text" id="formulir-search" placeholder="🔍 Cari formulir...">
+                    </div>
+                </div>
+                <div id="formulir-container"></div>
+            </div>
+            
+            <!-- Tab Tools -->
+            <div class="tab-content" id="tools">
+                <h2>Tools & Fitur</h2>
+                
+                <div class="quick-actions">
+                    <div class="action-card" id="action-calculator">
+                        <i>🧮</i>
+                        <h3>Kalkulator Harga</h3>
+                        <p>Hitung harga Robux PO & Via Login</p>
+                    </div>
+                    
+                    <div class="action-card" id="action-tanggal">
+                        <i>📅</i>
+                        <h3>Hitung Tanggal Pending</h3>
+                        <p>Estimasi kapan Robux akan masuk</p>
+                    </div>
+                    
+                    <div class="action-card" id="action-tax">
+                        <i>💰</i>
+                        <h3>Robux Tax Calculator</h3>
+                        <p>Hitung before & after tax Robux</p>
+                    </div>
+                </div>
+                
+                <div class="template-card" id="calculator-container" style="display: none;">
+                    <h3>Kalkulator Harga Robux</h3>
+                    
+                    <div class="form-group">
+                        <label>Pilih Tipe Robux:</label>
+                        <div class="tax-type-selector">
+                            <div class="tax-option">
+                                <input type="radio" id="robux-po" name="robux-type" value="po" checked>
+                                <label for="robux-po" class="tax-option-label">
+                                    <span class="tax-option-title">🛒 Robux PO</span>
+                                    <small>Via Gamepass (Pre-Order)</small>
+                                </label>
+                            </div>
+                            
+                            <div class="tax-option">
+                                <input type="radio" id="robux-login" name="robux-type" value="login">
+                                <label for="robux-login" class="tax-option-label">
+                                    <span class="tax-option-title">🔐 Robux Via Login</span>
+                                    <small>Instant Processing</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jumlah-robux-calc">Jumlah Robux:</label>
+                        <input type="number" id="jumlah-robux-calc" class="form-control" placeholder="Masukkan jumlah Robux" min="100">
+                    </div>
+                    
+                    <button class="btn" id="hitung-harga">Hitung Harga</button>
+                    
+                    <div id="hasil-hitung" class="template-content" style="display: none; margin-top: 15px;"></div>
+                    
+                    <!-- Daftar Harga -->
+                    <div class="price-list" style="margin-top: 20px; padding: 15px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--pink);">
+                        <h4 style="color: var(--pink-dark); margin-bottom: 10px;">📋 Daftar Harga Mayoblox</h4>
+                        
+                        <div class="price-category">
+                            <h5>🛒 Robux PO (Via Gamepass)</h5>
+                            <div class="price-items">
+                                <div class="price-item">100 Robux = <strong>Rp 14.000</strong></div>
+                                <div class="price-item">200 Robux = <strong>Rp 28.000</strong></div>
+                                <div class="price-item">300 Robux = <strong>Rp 42.000</strong></div>
+                                <div class="price-item">400 Robux = <strong>Rp 56.000</strong></div>
+                                <div class="price-item">500 Robux = <strong>Rp 70.000</strong></div>
+                                <div class="price-item">1.000 Robux = <strong>Rp 140.000</strong></div>
+                                <div class="price-item">2.000 Robux = <strong>Rp 280.000</strong></div>
+                            </div>
+                        </div>
+                        
+                        <div class="price-category" style="margin-top: 15px;">
+                            <h5>🔐 Robux Via Login</h5>
+                            <div class="price-items">
+                                <div class="price-item">100 Robux = <strong>Rp 17.000</strong></div>
+                                <div class="price-item">200 Robux = <strong>Rp 34.000</strong></div>
+                                <div class="price-item">300 Robux = <strong>Rp 51.000</strong></div>
+                                <div class="price-item">400 Robux = <strong>Rp 68.000</strong></div>
+                                <div class="price-item">500 Robux = <strong>Rp 85.000</strong></div>
+                                <div class="price-item">1.000 Robux = <strong>Rp 170.000</strong></div>
+                                <div class="price-item">2.000 Robux = <strong>Rp 340.000</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="template-card" id="tanggal-container" style="display: none;">
+                    <h3>Hitung Tanggal Pending Masuk</h3>
+                    <div class="form-group">
+                        <label for="tanggal-pending">Tanggal Pending:</label>
+                        <input type="datetime-local" id="tanggal-pending" class="form-control">
+                    </div>
+                    <button class="btn" id="hitung-tanggal">Hitung Estimasi</button>
+                    <div id="hasil-tanggal" class="template-content" style="display: none; margin-top: 15px;"></div>
+                </div>
+                
+                <div class="template-card" id="tax-container" style="display: none;">
+                    <h3>Robux Tax Calculator</h3>
+                    
+                    <div class="tax-calculator">
+                        <div class="tax-input-section">
+                            <div class="form-group">
+                                <label for="tax-amount">Jumlah Robux:</label>
+                                <input type="number" id="tax-amount" class="form-control" placeholder="Masukkan jumlah Robux" min="0">
+                            </div>
+                            
+                            <div class="tax-type-selector">
+                                <div class="tax-option">
+                                    <input type="radio" id="before-tax" name="tax-type" value="before" checked>
+                                    <label for="before-tax" class="tax-option-label">
+                                        <span class="tax-option-title">Robux before tax</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="tax-option">
+                                    <input type="radio" id="after-tax" name="tax-type" value="after">
+                                    <label for="after-tax" class="tax-option-label">
+                                        <span class="tax-option-title">Robux after tax</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div id="hasil-tax" class="template-content" style="display: none; margin-top: 15px;"></div>
+                        </div>
+                        
+                        <div class="tax-info" id="tax-info">
+                            <div class="info-card">
+                                <h4>💡 Tips & Info</h4>
+                                <ul>
+                                    <li>Roblox memotong 30% dari setiap transaksi gamepass</li>
+                                    <li>Untuk mendapatkan <strong>X Robux</strong>, set harga gamepass <strong>X ÷ 0.7</strong></li>
+                                    <li>Tax rate: <strong>30%</strong> dari harga gamepass</li>
+                                    <li>Penerimaan: <strong>70%</strong> dari harga gamepass</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Vilog dengan PIN Protection -->
+            <div class="tab-content" id="vilog">
+                <div class="tab-header">
+                    <h2>Vilog Only</h2>
+                    <div class="search-box">
+                        <input type="text" id="vilog-search" placeholder="🔍 Cari vilog...">
+                    </div>
+                </div>
+                
+                <!-- PIN Protection Screen -->
+                <div id="vilog-pin-protection">
+                    <div class="pin-protection">
+                        <div class="pin-box">
+                            <h3>🔒 Masukkan Secret Key</h3>
+                            <p>yang vilog vilog ajah</p>
+                            
+                            <div class="form-group">
+                                <label for="vilog-pin">Key:</label>
+                                <div class="password-container">
+                                    <input type="password" id="vilog-pin" class="form-control" placeholder="Masukkan Secret Key" maxlength="20">
+                                    <button type="button" class="toggle-password" id="toggleVilogPin">
+                                        <span class="toggle-icon">👁️</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" onclick="checkVilogPin()">Buka Vilog</button>
+                            <div class="error-message" id="pin-error" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Vilog Content (Awalnya Disembunyikan) -->
+                <div id="vilog-container" style="display: none;"></div>
+            </div>
+
+           <!-- ==================== TAB GIFT GAMEPASS ==================== -->
+<div class="tab-content" id="giftgamepass">
+    <!-- Di bagian Gift Gamepass header -->
+    <div class="tab-header">
+        <h2>🎁 Gift Gamepass</h2>
+        <!-- Admin Actions -->
+        <div class="admin-actions-header">
+            <button class="btn" onclick="showAddGamepassPopup()">➕ Tambah Gamepass</button>
+            <button class="btn" onclick="showEditRatesPopup()">📊 Edit Rate</button>
+        </div>
+    </div>
+    
+    <div class="gamepass-layout">
+        <!-- Sidebar kiri untuk Daftar Map -->
+        <div class="gamepass-sidebar">
+            <div class="sidebar-header">
+                <h3>Nama Map</h3>
+            </div>
+            <div class="map-list" id="map-list">
+                <!-- Map list akan diisi oleh JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Content kanan untuk Kalkulator Harga -->
+        <div class="gamepass-content">
+            <div class="content-header">
+                <h3 id="selected-map-title">Pilih Map</h3>
+            </div>
+            <div class="calculator-container">
+                <!-- HAPUS SELECT MAP - HANYA TAMPILKAN ITEMS SAJA -->
+                <div id="items-section" style="display: none;">
+                    <div class="form-group">
+                        <label>Pilih Item:</label>
+                        <div id="items-list"></div>
+                    </div>
+                    
+                    <!-- Di bagian Gift Gamepass - perbaiki custom item input -->
+                    <div class="form-group">
+                        <label for="custom-item-name">Atau Tambah Item Custom:</label>
+                        <div class="custom-item-input">
+                            <input type="text" id="custom-item-name" class="form-control" placeholder="Nama item">
+                            <input type="number" id="custom-item-robux" class="form-control" placeholder="Robux">
+                            <button class="btn btn-small" onclick="addCustomItem()" style="height: 45px; display: flex; align-items: center; justify-content: center; white-space: nowrap;">Tambah</button>
+                        </div>
+                    </div>
+                    
+                    <div id="selected-items" style="margin-bottom: 1rem;"></div>
+                    
+                    <button class="btn btn-calculate" onclick="calculateTotal()">💰 Hitung Total</button>
+                    
+                    <div id="calculation-result" style="display: none; margin-top: 1.5rem; padding: 1.5rem; background: var(--bg); border-radius: var(--radius); border: 2px solid var(--pink);">
+    <!-- Struktur hasil perhitungan akan diisi oleh JavaScript -->
+</div>
+                </div>
+
+                <!-- Untuk Gift Gamepass -->
+                <div id="no-map-selected" style="text-align: center; padding: 3rem; color: var(--muted);">
+                    <img src="foto/brah.png" alt="Mayo" class="mayo-icon">
+                    <h3>Pilih Map</h3>
+                    <p>Pilih salah satu map di sidebar kiri untuk memulai</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TAB RESELLER ==================== -->
+<div class="tab-content" id="reseller">
+    <div class="tab-header">
+        <h2>🎀 Gift Gamepass Reseller </h2>
+        <!-- Admin Actions -->
+        <div class="admin-actions-header">
+            <button class="btn" onclick="showAddGamepassPopupReseller()">➕ Tambah Gamepass</button>
+            <button class="btn" onclick="showEditRatesPopupReseller()">📊 Edit Rate</button>
+        </div>
+    </div>
+    
+    <div class="gamepass-layout">
+        <!-- Sidebar kiri untuk Daftar Map -->
+        <div class="gamepass-sidebar">
+            <div class="sidebar-header">
+                <h3>Nama Map</h3>
+            </div>
+            <div class="map-list" id="reseller-map-list">
+                <!-- Map list akan diisi oleh JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Content kanan untuk Kalkulator Harga -->
+        <div class="gamepass-content">
+            <div class="content-header">
+                <h3 id="reseller-selected-map-title">Pilih Map</h3>
+            </div>
+            <div class="calculator-container">
+                <!-- Items Section untuk Reseller -->
+                <div id="reseller-items-section" style="display: none;">
+                    <div class="form-group">
+                        <label>Pilih Item:</label>
+                        <div id="reseller-items-list"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reseller-custom-item-name">Atau Tambah Item Custom:</label>
+                        <div class="custom-item-input">
+                            <input type="text" id="reseller-custom-item-name" class="form-control" placeholder="Nama item">
+                            <input type="number" id="reseller-custom-item-robux" class="form-control" placeholder="Robux">
+                            <button class="btn btn-small" onclick="addCustomItemReseller()">Tambah</button>
+                        </div>
+                    </div>
+                    
+                    <div id="reseller-selected-items" style="margin-bottom: 1rem;"></div>
+                    
+                    <button class="btn btn-calculate" onclick="calculateTotalReseller()">💰 Hitung Total</button>
+                    
+                    <div id="reseller-calculation-result" style="display: none; margin-top: 1.5rem; padding: 1.5rem; background: var(--bg); border-radius: var(--radius); border: 2px solid var(--pink);">
+                        <!-- Struktur hasil perhitungan akan diisi oleh JavaScript -->
+                    </div>
+                </div>
+                
+                            <!-- Untuk Reseller -->
+            <div id="reseller-no-map-selected" style="text-align: center; padding: 3rem; color: var(--muted);">
+                <img src="foto/brah.png" alt="Mayo" class="mayo-icon">
+                <h3>Pilih Map</h3>
+                <p>Pilih salah satu map di sidebar kiri untuk memulai perhitungan harga reseller</p>
+            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Popup Edit Gamepass Reseller -->
+<div id="edit-gamepass-popup-reseller" class="popup-overlay">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h3 class="popup-title">✏️ Edit Gamepass Reseller</h3>
+            <button class="close-popup" onclick="closeEditPopupReseller()">×</button>
+        </div>
+        <div class="form-group">
+            <label for="edit-gamepass-name-reseller">Nama Gamepass:</label>
+            <input type="text" id="edit-gamepass-name-reseller" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="edit-gamepass-rate-reseller">Rate:</label>
+            <input type="number" id="edit-gamepass-rate-reseller" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Items:</label>
+            <div id="edit-items-container-reseller"></div>
+            <button class="btn" onclick="addEditItemFieldReseller()" style="margin-top: 0.5rem;">➕ Tambah Item</button>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+            <button class="btn" onclick="saveGamepassEditReseller()" style="flex: 1;">💾 Simpan</button>
+            <button class="btn" onclick="closeEditPopupReseller()" style="background: var(--danger);">❌ Batal</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Add Gamepass Reseller -->
+<div id="add-gamepass-popup-reseller" class="popup-overlay">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h3 class="popup-title">➕ Tambah Gamepass Baru (Reseller)</h3>
+            <button class="close-popup" onclick="closeAddPopupReseller()">×</button>
+        </div>
+        <div class="form-group">
+            <label for="new-gamepass-name-reseller">Nama Gamepass:</label>
+            <input type="text" id="new-gamepass-name-reseller" class="form-control" placeholder="Contoh: FISH IT">
+        </div>
+        <div class="form-group">
+            <label for="new-gamepass-rate-reseller">Rate:</label>
+            <input type="number" id="new-gamepass-rate-reseller" class="form-control" value="100">
+        </div>
+        <div class="form-group">
+            <label>Items:</label>
+            <div id="new-items-container-reseller">
+                <div class="item-input-row">
+                    <input type="text" class="form-control new-item-name-reseller" placeholder="Nama item">
+                    <input type="number" class="form-control new-item-robux-reseller" placeholder="Robux" style="width: 100px;">
+                    <button type="button" class="remove-item-btn" onclick="this.parentElement.remove()">×</button>
+                </div>
+            </div>
+            <button class="btn" onclick="addNewItemFieldReseller()" style="margin-top: 0.5rem;">➕ Tambah Item</button>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+            <button class="btn" onclick="addNewGamepassReseller()" style="flex: 1;">💾 Simpan</button>
+            <button class="btn" onclick="closeAddPopupReseller()" style="background: var(--danger);">❌ Batal</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Edit Rates Reseller -->
+<div id="edit-rates-popup-reseller" class="popup-overlay">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h3 class="popup-title">📊 Edit Rates Semua Gamepass (Reseller)</h3>
+            <button class="close-popup" onclick="closeRatesPopupReseller()">×</button>
+        </div>
+        <div id="rates-list-reseller"></div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+            <button class="btn" onclick="saveAllRatesReseller()" style="flex: 1;">💾 Simpan Semua</button>
+            <button class="btn" onclick="closeRatesPopupReseller()" style="background: var(--danger);">❌ Batal</button>
+        </div>
+    </div>
+</div>
+        </main>
+        
+        <!-- Footer -->
+        <footer>
+            <p>Made with 💗 | Dits</p>
+        </footer>
+    </div>
+
+    <!-- Popup Edit Gamepass -->
+    <div id="edit-gamepass-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h3 class="popup-title">✏️ Edit Gamepass</h3>
+                <button class="close-popup" onclick="closeEditPopup()">×</button>
+            </div>
+            <div class="form-group">
+                <label for="edit-gamepass-name">Nama Gamepass:</label>
+                <input type="text" id="edit-gamepass-name" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="edit-gamepass-rate">Rate:</label>
+                <input type="number" id="edit-gamepass-rate" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Items:</label>
+                <div id="edit-items-container"></div>
+                <button class="btn" onclick="addEditItemField()" style="margin-top: 0.5rem;">➕ Tambah Item</button>
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+                <button class="btn" onclick="saveGamepassEdit()" style="flex: 1;">💾 Simpan</button>
+                <button class="btn" onclick="closeEditPopup()" style="background: var(--danger);">❌ Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Add Gamepass -->
+<div id="add-gamepass-popup" class="popup-overlay">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h3 class="popup-title">➕ Tambah Gamepass Baru</h3>
+            <button class="close-popup" onclick="closeAddPopup()">×</button>
+        </div>
+        <div class="form-group">
+            <label for="new-gamepass-name">Nama Gamepass:</label>
+            <input type="text" id="new-gamepass-name" class="form-control" placeholder="Contoh: FISH IT">
+        </div>
+        <div class="form-group">
+            <label for="new-gamepass-rate">Rate:</label>
+            <input type="number" id="new-gamepass-rate" class="form-control" value="110">
+        </div>
+        <div class="form-group">
+            <label>Items:</label>
+            <div id="new-items-container">
+                <div class="item-input-row">
+                    <input type="text" class="form-control new-item-name" placeholder="Nama item">
+                    <input type="number" class="form-control new-item-robux" placeholder="Robux" style="width: 100px;">
+                    <button type="button" class="remove-item-btn" onclick="this.parentElement.remove()">×</button>
+                </div>
+            </div>
+            <button class="btn" onclick="addNewItemField()" style="margin-top: 0.5rem;">➕ Tambah Item</button>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+            <button class="btn" onclick="addNewGamepass()" style="flex: 1;">💾 Simpan</button>
+            <button class="btn" onclick="closeAddPopup()" style="background: var(--danger);">❌ Batal</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Popup Edit Rates -->
+    <div id="edit-rates-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h3 class="popup-title">📊 Edit Rates Semua Gamepass</h3>
+                <button class="close-popup" onclick="closeRatesPopup()">×</button>
+            </div>
+            <div id="rates-list"></div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+                <button class="btn" onclick="saveAllRates()" style="flex: 1;">💾 Simpan Semua</button>
+                <button class="btn" onclick="closeRatesPopup()" style="background: var(--danger);">❌ Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+    <!-- Login Check Script -->
+</body>
+</html>

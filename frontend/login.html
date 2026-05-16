@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mayoblox Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Favicon -->
+    <link rel="icon" href="foto/sticker.webp" type="image/webp">
+    <link rel="shortcut icon" href="foto/sticker.webp" type="image/webp">
+    <link rel="apple-touch-icon" href="foto/sticker.webp">
+    <style>
+        /* Login Page Specific Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            padding: 20px;
+        }
+
+        .login-box {
+            background: var(--card);
+            padding: clamp(2rem, 5vw, 3rem);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-hover);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 2px solid var(--pink);
+        }
+
+        .login-gif {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem auto;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        .login-logo {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            color: var(--pink-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--muted);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .login-form {
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--pink);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg);
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--pink-dark);
+            box-shadow: 0 0 0 3px rgba(249, 180, 199, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: var(--muted);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--pink);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            font-family: inherit;
+        }
+
+        .login-btn:hover {
+            background: var(--pink-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+
+        .theme-toggle-login {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--pink);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .theme-toggle-login:hover {
+            background: var(--pink-dark);
+            transform: translateY(-1px);
+        }
+
+        .password-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-container .form-control {
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-icon {
+            font-size: 1rem;
+            user-select: none;
+        }
+
+        /* Dark mode adjustments */
+        body.dark .toggle-password:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Loading Screen Styles untuk login page */
+        .neoleaf-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        body.dark .neoleaf-loading {
+            background: var(--bg);
+        }
+
+        .loading-content {
+            text-align: center;
+            color: var(--text);
+        }
+
+        .loading-logo {
+            font-size: 5rem;
+            font-weight: 800;
+            margin-bottom: 3rem;
+            color: rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: inline-block;
+        }
+
+        body.dark .loading-logo {
+            color: rgba(255, 255, 255, 0.1);
+        }
+
+        .loading-logo::after {
+            content: 'MayoBlox';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            color: var(--pink);
+            background: linear-gradient(135deg, var(--pink) 0%, var(--pink-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            overflow: hidden;
+            animation: textWaveFill 2.5s ease-in-out forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes textWaveFill {
+            0% { width: 0%; background-position: 0% 50%; }
+            25% { width: 25%; background-position: 25% 50%; }
+            50% { width: 50%; background-position: 50% 50%; }
+            75% { width: 75%; background-position: 75% 50%; }
+            100% { width: 100%; background-position: 100% 50%; }
+        }
+
+        .loading-percentage {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease 0.8s forwards;
+            letter-spacing: 1px;
+        }
+
+.loading-final {
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+}
+
+.final-photo {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    
+    /* GLOW SUBTLE - mengikuti bentuk PNG */
+    filter: drop-shadow(0 0 10px rgba(249, 180, 199, 0.4))
+           drop-shadow(0 0 15px rgba(249, 180, 199, 0.3));
+}
+
+.loading-final.animate {
+    animation: subtleGlowExpand 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes subtleGlowExpand {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.5);
+        filter: drop-shadow(0 0 5px rgba(249, 180, 199, 0.2))
+               drop-shadow(0 0 8px rgba(249, 180, 199, 0.1));
+    }
+    50% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.1);
+        filter: drop-shadow(0 0 12px rgba(249, 180, 199, 0.5))
+               drop-shadow(0 0 18px rgba(249, 180, 199, 0.3));
+    }
+    80% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1);
+        filter: drop-shadow(0 0 10px rgba(249, 180, 199, 0.4))
+               drop-shadow(0 0 15px rgba(249, 180, 199, 0.3));
+    }
+    100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(1.2);
+        filter: drop-shadow(0 0 8px rgba(249, 180, 199, 0.3))
+               drop-shadow(0 0 12px rgba(249, 180, 199, 0.2));
+    }
+}
+
+    /* Animasi untuk foto */
+@keyframes finalPhotoExpand {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    50% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    80% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+}
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle-login" id="theme-toggle-login">🌙</button>
+    
+    <div class="login-container">
+        <div class="login-box">
+            <!-- Tambahkan GIF di sini -->
+            <img src="foto/FAVICON.gif" alt="Mayoblox" class="login-gif">
+            
+            <div class="login-logo">Mayoblox Admin</div>
+            <div class="login-subtitle">Login dulu yagesya</div>
+            
+            <div class="error-message" id="errorMessage"></div>
+            
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Masukkan username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="password" class="form-control" placeholder="Masukkan password" required>
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <span class="toggle-icon">👁️</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-btn" id="loginBtn">Login</button>
+            </form>            
+        </div>
+    </div>
+
+    <!-- LOADING SCREEN - Awalnya disembunyikan -->
+<div class="neoleaf-loading" id="neoleafLoading" style="display: none;">
+    <div class="loading-content">
+        <div class="loading-logo">MayoBlox</div>
+        <div class="loading-percentage" id="loadingPercentage">loading 0%</div>
+        <!-- Ganti final animation dengan foto -->
+        <div class="loading-final" id="loadingFinal">
+            <img src="foto/sticker.webp" alt="MayoBlox" class="final-photo">
+        </div>
+    </div>
+</div>
+
+    <script>
+        // Database user dengan role
+        const users = {
+            'dits': { 
+                password: 'onlydits', 
+                name: 'Dits',
+                role: 'admin' // Akses penuh
+            },
+            'cs': { 
+                password: 'akucape', 
+                name: 'CS',
+                role: 'cs' // Tidak ada akses vilog
+            },
+            'floppa': { 
+                password: 'floppazakaria', 
+                name: 'Floppa',
+                role: 'floppa' // Hanya akses vilog
+            },
+            'suci': { 
+                password: 'sucimaharani', 
+                name: 'Suci',
+                role: 'suci' // Hanya akses Gift Gamepass
+            },
+        };
+
+        // Cek jika sudah login
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'index.html';
+        }
+
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const themeToggle = document.getElementById('theme-toggle-login');
+        const loginBtn = document.getElementById('loginBtn');
+        const loadingScreen = document.getElementById('neoleafLoading');
+        const loadingPercentage = document.getElementById('loadingPercentage');
+        const loadingFinal = document.getElementById('loadingFinal');
+
+        // ==================== LOADING SYSTEM ====================
+        let loadingProgress = 0;
+        let loadingInterval;
+
+        function showLoadingScreen() {
+            loadingScreen.style.display = 'flex';
+            startLoadingAnimation();
+        }
+
+        function hideLoadingScreen() {
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.visibility = 'hidden';
+            
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                loadingScreen.style.opacity = '1';
+                loadingScreen.style.visibility = 'visible';
+            }, 800);
+        }
+
+   function startLoadingAnimation() {
+    loadingProgress = 0;
+    clearInterval(loadingInterval);
+    
+    loadingInterval = setInterval(() => {
+        // Progress lebih smooth
+        loadingProgress += Math.random() * 5 + 1; // 1-6% per interval
+        
+        if (loadingProgress >= 100) {
+            loadingProgress = 100;
+            clearInterval(loadingInterval);
+            
+            // Final animation dengan FOTO
+            setTimeout(() => {
+                if (loadingFinal) {
+                    // Tampilkan foto (bukan text)
+                    loadingFinal.classList.add('animate');
+                    
+                    // Redirect setelah animasi foto selesai
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1200);
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }, 300);
+        }
+        
+        // Update percentage
+        if (loadingPercentage) {
+            loadingPercentage.textContent = `loading ${Math.floor(loadingProgress)}%`;
+        }
+        
+    }, 100);
+}    
+
+        function updateLoadingProgress(progress) {
+            loadingProgress = progress;
+            if (loadingPercentage) {
+                loadingPercentage.textContent = `loading ${Math.floor(loadingProgress)}%`;
+            }
+        }
+
+        // ==================== DATA LOADING (FAST - pakai backend bukan Google Sheets) ====================
+        async function loadAllData() {
+            console.log('📥 Loading data from backend...');
+            try {
+                updateLoadingProgress(30);
+                const response = await fetch('http://localhost:3000/api?action=getGamepassData');
+                
+                updateLoadingProgress(65);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                updateLoadingProgress(85);
+
+                if (data.success && data.gamepassData) {
+                    const gamepassData = data.gamepassData;
+                    let resellerData = data.resellerData || {};
+
+                    if (Object.keys(resellerData).length === 0) {
+                        resellerData = {};
+                        Object.keys(gamepassData).forEach(name => {
+                            resellerData[name] = { rate: 90, items: { ...gamepassData[name].items } };
+                        });
+                    }
+
+                    localStorage.setItem('gamepassData', JSON.stringify(gamepassData));
+                    localStorage.setItem('resellerData', JSON.stringify(resellerData));
+                    updateLoadingProgress(100);
+                    console.log('✅ Data loaded:', Object.keys(gamepassData).length, 'gamepasses');
+                    return true;
+                }
+                throw new Error('API returned error');
+            } catch (error) {
+                console.warn('⚠️ Backend fetch failed, using cached data:', error.message);
+                // Fallback ke localStorage jika ada
+                const savedGamepass = localStorage.getItem('gamepassData');
+                if (savedGamepass) {
+                    updateLoadingProgress(100);
+                    console.log('🔄 Using cached data as fallback');
+                    return true;
+                }
+                updateLoadingProgress(100);
+                return false;
+            }
+        }
+
+        // Toggle Password Function
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = this;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.innerHTML = '<span class="toggle-icon">🙈</span>';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.innerHTML = '<span class="toggle-icon">👁️</span>';
+            }
+            
+            passwordInput.focus();
+        });
+
+        // Theme toggle untuk login page
+        function initLoginTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.body.classList.remove('dark');
+                themeToggle.textContent = '🌙';
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            
+            if (isDark) {
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Initialize theme
+        initLoginTheme();
+
+        // Login form handler
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Validasi login
+            if (users[username] && users[username].password === password) {
+                // Login sukses - simpan info user
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                localStorage.setItem('userDisplayName', users[username].name);
+                localStorage.setItem('userRole', users[username].role);
+                localStorage.removeItem('activeTab');
+                
+                // Update tombol login
+                loginBtn.textContent = '🔄 Memuat Data...';
+                loginBtn.disabled = true;
+                
+                // Sembunyikan form login, tampilkan loading screen
+                document.querySelector('.login-container').style.display = 'none';
+                showLoadingScreen();
+                
+                console.log('🔄 Starting data loading after login...');
+                
+                // Load semua data dengan progress real
+                try {
+                    await loadAllData();
+                    console.log('✅ Data loading completed, ready to redirect');
+                    // Redirect akan dilakukan otomatis di loading animation
+                } catch (error) {
+                    console.error('❌ Data loading failed:', error);
+                    // Tetap redirect meski data gagal load
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                }
+                
+            } else {
+                // Login gagal
+                showError('Username atau password salah!');
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            
+            // Sembunyikan error setelah 3 detik
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // Enter key untuk submit form
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Fallback jika GIF tidak ditemukan
+        document.querySelector('.login-gif').addEventListener('error', function() {
+            this.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
