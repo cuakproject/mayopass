@@ -1,33 +1,136 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs/promises');
-const path = require('path');
+const { MongoClient } = require('mongodb');
 
 const app = express();
-// Path ke data.json yang ada di folder backend
-const DATA_FILE = path.join(__dirname, '../backend/data.json');
+const PORT = process.env.PORT || 3000;
+
+// MongoDB Connection String
+const MONGODB_URI = 'mongodb+srv://mayocuak_db_user:WCFdmV3UzfNwVsem@cluster0.efrs7os.mongodb.net/?appName=Cluster0';
+const DB_NAME = 'mayopass';
+const COLLECTION_NAME = 'gamepasses';
+
+let db;
+let client;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// ==================== HELPER FUNCTIONS ====================
-async function readData() {
+// Connect to MongoDB
+async function connectDB() {
+    if (db) return db;
+    
     try {
-        const raw = await fs.readFile(DATA_FILE, 'utf-8');
-        return JSON.parse(raw);
+        client = new MongoClient(MONGODB_URI);
+        await client.connect();
+        db = client.db(DB_NAME);
+        console.log('✅ Connected to MongoDB Atlas');
+        
+        // Create collection with indexes if not exists
+        const collections = await db.listCollections({ name: COLLECTION_NAME }).toArray();
+        if (collections.length === 0) {
+            await db.createCollection(COLLECTION_NAME);
+            await db.collection(COLLECTION_NAME).createIndex({ type: 1 });
+            
+            // Insert default data
+            await db.collection(COLLECTION_NAME).insertMany([
+                { type: 'gamepassData', data: {} },
+                { type: 'resellerData', data: {} }
+            ]);
+            console.log('✅ Default collections created');
+        }
+        
+        return db;
     } catch (error) {
-        return { gamepassData: {}, resellerData: {} };
+        console.error('MongoDB connection error:', error);
+        throw error;
     }
 }
 
-async function writeData(data) {
-    await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2));
+// Helper functions
+async function getGamepassData() {
+    const database = await connectDB();
+    const doc = await database.collection(COLLECTION_NAME).findOne({ type: 'gamepassData' });
+    return doc ? doc.data : {};
+}
+
+async function getResellerData() {
+    const database = await connectDB();
+    const doc = await database.collection(COLLECTION_NAME).findOne({ type: 'resellerData' });
+    return doc ? doc.data : {};
+}
+
+async function saveGamepassData(gamepassData) {
+    const database = await connectDB();
+    await database.collection(COLLECTION_NAME).updateOne(
+        { type: 'gamepassData' },
+        { $set: { data: gamepassData } },
+        { upsert: true }
+    );
+}
+
+async function saveResellerData(resellerData) {
+    const database = await connectDB();
+    await database.collection(COLLECTION_NAME).updateOne(
+        { type: 'resellerData' },
+        { $set: { data: resellerData } },
+        { upsert: true }
+    );
+}
+
+async function deleteGamepass(gamepassName) {
+    const database = await connectDB();
+    const gamepassData = await getGamepassData();
+    const resellerData = await getResellerData();
+    
+    delete gamepassData[gamepassName];
+    delete resellerData[gamepassName];
+    
+    await saveGamepassData(gamepassData);
+    await saveResellerData(resellerData);
+}
+
+async function updateGamepass(oldName, newName, rate, items) {
+    const database = await connectDB();
+    const gamepassData = await getGamepassData();
+    const resellerData = await getResellerData();
+    
+    const hasGamepass = gamepassData[oldName];
+    const hasReseller = resellerData[oldName];
+    
+    if (hasGamepass) {
+        delete gamepassData[oldName];
+        gamepassData[newName] = { rate: parseInt(rate), items };
+    }
+    
+    if (hasReseller) {
+        const resellerRate = hasGamepass ? gamepassData[newName].rate : rate;
+        delete resellerData[oldName];
+        resellerData[newName] = { rate: parseInt(resellerRate), items };
+    }
+    
+    await saveGamepassData(gamepassData);
+    await saveResellerData(resellerData);
+}
+
+async function updateRates(rates) {
+    const database = await connectDB();
+    const gamepassData = await getGamepassData();
+    
+    for (const [name, newRate] of Object.entries(rates)) {
+        if (gamepassData[name]) {
+            gamepassData[name].rate = parseInt(newRate);
+        }
+    }
+    
+    await saveGamepassData(gamepassData);
 }
 
 // ==================== API ENDPOINTS ====================
 app.all('/api', async (req, res) => {
     try {
+        await connectDB();
         const action = req.query.action || req.body?.action;
 
         if (!action) {
@@ -39,11 +142,12 @@ app.all('/api', async (req, res) => {
 
         // 1. GET ALL DATA
         if (action === 'getGamepassData') {
-            const data = await readData();
+            const gamepassData = await getGamepassData();
+            const resellerData = await getResellerData();
             return res.json({
                 success: true,
-                gamepassData: data.gamepassData,
-                resellerData: data.resellerData
+                gamepassData: gamepassData,
+                resellerData: resellerData
             });
         }
 
@@ -67,17 +171,15 @@ app.all('/api', async (req, res) => {
                 });
             }
 
-            const current = await readData();
-
             if (gamepassData) {
-                Object.assign(current.gamepassData, gamepassData);
+                const current = await getGamepassData();
+                Object.assign(current, gamepassData);
+                await saveGamepassData(current);
             }
 
             if (resellerData) {
-                current.resellerData = resellerData;
+                await saveResellerData(resellerData);
             }
-
-            await writeData(current);
 
             return res.json({
                 success: true,
@@ -96,15 +198,7 @@ app.all('/api', async (req, res) => {
                 });
             }
 
-            const current = await readData();
-
-            delete current.gamepassData[gamepassName];
-
-            if (current.resellerData[gamepassName]) {
-                delete current.resellerData[gamepassName];
-            }
-
-            await writeData(current);
+            await deleteGamepass(gamepassName);
 
             return res.json({
                 success: true,
@@ -127,8 +221,6 @@ app.all('/api', async (req, res) => {
                 });
             }
 
-            rate = parseInt(rate);
-
             if (typeof items === 'string') {
                 try {
                     items = JSON.parse(decodeURIComponent(items));
@@ -144,33 +236,7 @@ app.all('/api', async (req, res) => {
                 }
             }
 
-            const current = await readData();
-            const hasGamepass = Boolean(current.gamepassData[oldName]);
-            const hasReseller = Boolean(current.resellerData[oldName]);
-
-            if (!hasGamepass && !hasReseller) {
-                return res.json({
-                    success: false,
-                    error: `Gamepass "${oldName}" not found`
-                });
-            }
-
-            if (hasGamepass) {
-                delete current.gamepassData[oldName];
-                current.gamepassData[newName] = { rate, items };
-            }
-
-            if (hasReseller) {
-                const resellerOld = current.resellerData[oldName];
-                const resellerRate = hasGamepass ? resellerOld.rate : rate;
-                delete current.resellerData[oldName];
-                current.resellerData[newName] = {
-                    rate: resellerRate,
-                    items: items
-                };
-            }
-
-            await writeData(current);
+            await updateGamepass(oldName, newName, rate, items);
 
             return res.json({
                 success: true,
@@ -204,15 +270,7 @@ app.all('/api', async (req, res) => {
                 });
             }
 
-            const current = await readData();
-
-            for (const [name, newRate] of Object.entries(rates)) {
-                if (current.gamepassData[name]) {
-                    current.gamepassData[name].rate = parseInt(newRate);
-                }
-            }
-
-            await writeData(current);
+            await updateRates(rates);
 
             return res.json({
                 success: true,
@@ -240,10 +298,18 @@ app.all('/api', async (req, res) => {
 app.get('/', (req, res) => {
     res.json({
         status: 'online',
-        message: 'Mayoblox API is running',
+        message: 'Mayoblox API is running with MongoDB',
         timestamp: new Date().toISOString()
     });
 });
+
+// Start server (hanya untuk local run)
+if (require.main === module) {
+    app.listen(PORT, async () => {
+        await connectDB();
+        console.log(`✅ Mayoblox API running on http://localhost:${PORT}`);
+    });
+}
 
 // Export untuk Vercel
 module.exports = app;
