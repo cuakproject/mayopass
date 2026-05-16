@@ -1,0 +1,13 @@
+{
+    "name": "mayoblox-backend",
+    "version": "1.0.0",
+    "description": "Backend API untuk Mayoblox Admin Tools",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "mongodb": "^6.3.0"
+    }
+}
