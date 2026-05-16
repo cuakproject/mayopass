@@ -4,8 +4,8 @@ const fs = require('fs/promises');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'data.json');
+// Path ke data.json yang ada di folder backend
+const DATA_FILE = path.join(__dirname, '../backend/data.json');
 
 // Middleware
 app.use(cors());
@@ -17,7 +17,6 @@ async function readData() {
         const raw = await fs.readFile(DATA_FILE, 'utf-8');
         return JSON.parse(raw);
     } catch (error) {
-        // Return empty data if file doesn't exist
         return { gamepassData: {}, resellerData: {} };
     }
 }
@@ -29,7 +28,6 @@ async function writeData(data) {
 // ==================== API ENDPOINTS ====================
 app.all('/api', async (req, res) => {
     try {
-        // Get action from query (GET) or body (POST)
         const action = req.query.action || req.body?.action;
 
         if (!action) {
@@ -49,11 +47,10 @@ app.all('/api', async (req, res) => {
             });
         }
 
-        // 2. SAVE DATA (partial update)
+        // 2. SAVE DATA
         else if (action === 'saveGamepassData') {
             let gamepassData, resellerData;
 
-            // Support both GET and POST
             if (req.query.data) {
                 const decoded = JSON.parse(decodeURIComponent(req.query.data));
                 gamepassData = decoded.gamepassData;
@@ -72,12 +69,10 @@ app.all('/api', async (req, res) => {
 
             const current = await readData();
 
-            // Merge gamepassData
             if (gamepassData) {
                 Object.assign(current.gamepassData, gamepassData);
             }
 
-            // Overwrite resellerData completely
             if (resellerData) {
                 current.resellerData = resellerData;
             }
@@ -117,11 +112,10 @@ app.all('/api', async (req, res) => {
             });
         }
 
-        // 4. UPDATE GAMEPASS (rename, rate, items)
+        // 4. UPDATE GAMEPASS
         else if (action === 'updateGamepass') {
             let { oldName, newName, rate, items } = req.query;
 
-            // Prioritize POST body
             if (req.body && req.body.oldName) {
                 ({ oldName, newName, rate, items } = req.body);
             }
@@ -135,7 +129,6 @@ app.all('/api', async (req, res) => {
 
             rate = parseInt(rate);
 
-            // Parse items if it's a string (from GET URL)
             if (typeof items === 'string') {
                 try {
                     items = JSON.parse(decodeURIComponent(items));
@@ -227,7 +220,6 @@ app.all('/api', async (req, res) => {
             });
         }
 
-        // Unknown action
         else {
             return res.json({
                 success: false,
@@ -253,8 +245,5 @@ app.get('/', (req, res) => {
     });
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`✅ Mayoblox API running on http://localhost:${PORT}`);
-    console.log(`📁 Data file: ${DATA_FILE}`);
-});
+// Export untuk Vercel
+module.exports = app;
