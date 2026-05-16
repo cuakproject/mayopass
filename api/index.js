@@ -1,86 +1,60 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient } = require('mongodb');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// MongoDB Connection String
-const MONGODB_URI = 'mongodb+srv://mayocuak_db_user:WCFdmV3UzfNwVsem@cluster0.efrs7os.mongodb.net/?appName=Cluster0';
-const DB_NAME = 'mayopass';
-const COLLECTION_NAME = 'gamepasses';
+// Ganti dengan data dari Supabase lo
+const SUPABASE_URL = 'https://yuutdtgzjxrzybztrwdc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_o8wTMo0P5AVdgI3M-FprQQ_Q20jmIGZ';
 
-let db;
-let client;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-async function connectDB() {
-    if (db) return db;
-    
-    try {
-        client = new MongoClient(MONGODB_URI);
-        await client.connect();
-        db = client.db(DB_NAME);
-        console.log('✅ Connected to MongoDB Atlas');
-        
-        // Create collection with indexes if not exists
-        const collections = await db.listCollections({ name: COLLECTION_NAME }).toArray();
-        if (collections.length === 0) {
-            await db.createCollection(COLLECTION_NAME);
-            await db.collection(COLLECTION_NAME).createIndex({ type: 1 });
-            
-            // Insert default data
-            await db.collection(COLLECTION_NAME).insertMany([
-                { type: 'gamepassData', data: {} },
-                { type: 'resellerData', data: {} }
-            ]);
-            console.log('✅ Default collections created');
-        }
-        
-        return db;
-    } catch (error) {
-        console.error('MongoDB connection error:', error);
-        throw error;
-    }
-}
-
-// Helper functions
+// ==================== HELPER FUNCTIONS ====================
 async function getGamepassData() {
-    const database = await connectDB();
-    const doc = await database.collection(COLLECTION_NAME).findOne({ type: 'gamepassData' });
-    return doc ? doc.data : {};
+    const { data, error } = await supabase
+        .from('gamepass_data')
+        .select('data')
+        .eq('type', 'gamepassData')
+        .single();
+    
+    if (error && error.code !== 'PGRST116') throw error;
+    return data?.data || {};
 }
 
 async function getResellerData() {
-    const database = await connectDB();
-    const doc = await database.collection(COLLECTION_NAME).findOne({ type: 'resellerData' });
-    return doc ? doc.data : {};
+    const { data, error } = await supabase
+        .from('gamepass_data')
+        .select('data')
+        .eq('type', 'resellerData')
+        .single();
+    
+    if (error && error.code !== 'PGRST116') throw error;
+    return data?.data || {};
 }
 
 async function saveGamepassData(gamepassData) {
-    const database = await connectDB();
-    await database.collection(COLLECTION_NAME).updateOne(
-        { type: 'gamepassData' },
-        { $set: { data: gamepassData } },
-        { upsert: true }
-    );
+    const { error } = await supabase
+        .from('gamepass_data')
+        .update({ data: gamepassData })
+        .eq('type', 'gamepassData');
+    
+    if (error) throw error;
 }
 
 async function saveResellerData(resellerData) {
-    const database = await connectDB();
-    await database.collection(COLLECTION_NAME).updateOne(
-        { type: 'resellerData' },
-        { $set: { data: resellerData } },
-        { upsert: true }
-    );
+    const { error } = await supabase
+        .from('gamepass_data')
+        .update({ data: resellerData })
+        .eq('type', 'resellerData');
+    
+    if (error) throw error;
 }
 
 async function deleteGamepass(gamepassName) {
-    const database = await connectDB();
     const gamepassData = await getGamepassData();
     const resellerData = await getResellerData();
     
@@ -92,7 +66,6 @@ async function deleteGamepass(gamepassName) {
 }
 
 async function updateGamepass(oldName, newName, rate, items) {
-    const database = await connectDB();
     const gamepassData = await getGamepassData();
     const resellerData = await getResellerData();
     
@@ -115,7 +88,6 @@ async function updateGamepass(oldName, newName, rate, items) {
 }
 
 async function updateRates(rates) {
-    const database = await connectDB();
     const gamepassData = await getGamepassData();
     
     for (const [name, newRate] of Object.entries(rates)) {
@@ -130,7 +102,6 @@ async function updateRates(rates) {
 // ==================== API ENDPOINTS ====================
 app.all('/api', async (req, res) => {
     try {
-        await connectDB();
         const action = req.query.action || req.body?.action;
 
         if (!action) {
@@ -298,18 +269,9 @@ app.all('/api', async (req, res) => {
 app.get('/', (req, res) => {
     res.json({
         status: 'online',
-        message: 'Mayoblox API is running with MongoDB',
+        message: 'Mayoblox API is running with Supabase',
         timestamp: new Date().toISOString()
     });
 });
 
-// Start server (hanya untuk local run)
-if (require.main === module) {
-    app.listen(PORT, async () => {
-        await connectDB();
-        console.log(`✅ Mayoblox API running on http://localhost:${PORT}`);
-    });
-}
-
-// Export untuk Vercel
 module.exports = app;
