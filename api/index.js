@@ -1,10 +1,13 @@
 const { MongoClient } = require('mongodb');
 
-// GANTI DENGAN CONNECTION STRING DARI MONGODB ATLAS LO!
+// ==================== KONFIGURASI ====================
+// Ganti dengan connection string MongoDB Atlas Anda
 const MONGODB_URI = 'mongodb+srv://mayocuak_db_user:mayoblox123@cluster0.efrs7os.mongodb.net/mayopass?retryWrites=true&w=majority';
 const DB_NAME = 'mayopass';
 const COLLECTION_NAME = 'gamepass_data';
+const RESELLER_RATE = 90; // Rate global untuk reseller (bisa diubah sesuai keinginan)
 
+// ==================== KONEKSI DATABASE ====================
 let cachedClient = null;
 let cachedDb = null;
 
@@ -20,8 +23,9 @@ async function connectToDatabase() {
   return db;
 }
 
+// ==================== MAIN HANDLER ====================
 module.exports = async (req, res) => {
-  // CORS
+  // CORS - biar bisa diakses dari mana saja
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -36,7 +40,7 @@ module.exports = async (req, res) => {
     const db = await connectToDatabase();
     const collection = db.collection(COLLECTION_NAME);
     
-    // GET DATA
+    // ==================== GET DATA ====================
     if (action === 'getGamepassData') {
       let gamepassDoc = await collection.findOne({ type: 'gamepassData' });
       let resellerDoc = await collection.findOne({ type: 'resellerData' });
@@ -58,10 +62,11 @@ module.exports = async (req, res) => {
       });
     }
     
-    // SAVE DATA
+    // ==================== SAVE DATA (DENGAN SYNC OTOMATIS) ====================
     if (action === 'saveGamepassData') {
       let gamepassData, resellerData;
       
+      // Ambil data dari query parameter (GET) atau body (POST)
       if (req.query.data) {
         const decoded = JSON.parse(decodeURIComponent(req.query.data));
         gamepassData = decoded.gamepassData;
@@ -71,51 +76,127 @@ module.exports = async (req, res) => {
         resellerData = req.body.resellerData;
       }
       
-      if (gamepassData) {
+      // ===== 1. PROSES GAMEPASS DATA =====
+      if (gamepassData && Object.keys(gamepassData).length > 0) {
+        // Ambil data gamepass yang sudah ada
+        const gamepassDoc = await collection.findOne({ type: 'gamepassData' });
+        const currentGamepassData = gamepassDoc?.data || {};
+        
+        // Merge dengan data baru (update atau tambah)
+        for (const [gameName, gameValue] of Object.entries(gamepassData)) {
+          // Kalo ada items, berarti ini gamepass lengkap
+          if (gameValue.items) {
+            currentGamepassData[gameName] = {
+              rate: gameValue.rate || 100,
+              items: gameValue.items
+            };
+          } 
+          // Kalo cuma rate doang (update rate)
+          else if (gameValue.rate && !gameValue.items) {
+            if (currentGamepassData[gameName]) {
+              currentGamepassData[gameName].rate = gameValue.rate;
+            }
+          }
+        }
+        
+        // Simpan gamepassData yang sudah di-merge
         await collection.updateOne(
           { type: 'gamepassData' },
-          { $set: { data: gamepassData } },
+          { $set: { data: currentGamepassData } },
           { upsert: true }
         );
-      }
-      
-      if (resellerData) {
+        
+        // ===== 2. SYNC OTOMATIS KE RESELLER DENGAN RATE 90 =====
+        const resellerDoc = await collection.findOne({ type: 'resellerData' });
+        const currentResellerData = resellerDoc?.data || {};
+        
+        // Loop setiap gamepass yang ada di gamepassData
+        for (const [gameName, gameValue] of Object.entries(currentGamepassData)) {
+          // Kalo gamepass punya items, masukin ke reseller dengan rate RESELLER_RATE
+          if (gameValue.items) {
+            currentResellerData[gameName] = {
+              rate: RESELLER_RATE,
+              items: gameValue.items
+            };
+          }
+        }
+        
+        // Simpan resellerData yang sudah di-sync
         await collection.updateOne(
           { type: 'resellerData' },
-          { $set: { data: resellerData } },
+          { $set: { data: currentResellerData } },
           { upsert: true }
         );
       }
       
-      return res.json({ success: true, message: 'Data saved successfully' });
+      // ===== 3. PROSES RESELLER DATA MANUAL (OPSIONAL) =====
+      // Kalo ada kiriman resellerData manual, tetap diproses
+      if (resellerData && Object.keys(resellerData).length > 0) {
+        const resellerDoc = await collection.findOne({ type: 'resellerData' });
+        const currentResellerData = resellerDoc?.data || {};
+        
+        for (const [gameName, gameValue] of Object.entries(resellerData)) {
+          if (gameValue.items) {
+            currentResellerData[gameName] = {
+              rate: gameValue.rate || RESELLER_RATE,
+              items: gameValue.items
+            };
+          } else if (gameValue.rate && !gameValue.items) {
+            if (currentResellerData[gameName]) {
+              currentResellerData[gameName].rate = gameValue.rate;
+            }
+          }
+        }
+        
+        await collection.updateOne(
+          { type: 'resellerData' },
+          { $set: { data: currentResellerData } },
+          { upsert: true }
+        );
+      }
+      
+      return res.json({ 
+        success: true, 
+        message: 'Data saved successfully with auto-sync to reseller!' 
+      });
     }
     
-    // DELETE
+    // ==================== DELETE GAMEPASS ====================
     if (action === 'deleteGamepass') {
       const gamepassName = req.query.gamepassName || req.body?.gamepassName;
       if (!gamepassName) {
         return res.json({ success: false, error: 'gamepassName required' });
       }
       
+      // Hapus dari gamepassData
       const gamepassDoc = await collection.findOne({ type: 'gamepassData' });
-      const resellerDoc = await collection.findOne({ type: 'resellerData' });
-      
-      if (gamepassDoc?.data) delete gamepassDoc.data[gamepassName];
-      if (resellerDoc?.data) delete resellerDoc.data[gamepassName];
+      const gamepassData = gamepassDoc?.data || {};
+      delete gamepassData[gamepassName];
       
       await collection.updateOne(
         { type: 'gamepassData' },
-        { $set: { data: gamepassDoc?.data || {} } }
-      );
-      await collection.updateOne(
-        { type: 'resellerData' },
-        { $set: { data: resellerDoc?.data || {} } }
+        { $set: { data: gamepassData } },
+        { upsert: true }
       );
       
-      return res.json({ success: true, message: `"${gamepassName}" deleted` });
+      // Hapus juga dari resellerData
+      const resellerDoc = await collection.findOne({ type: 'resellerData' });
+      const resellerData = resellerDoc?.data || {};
+      delete resellerData[gamepassName];
+      
+      await collection.updateOne(
+        { type: 'resellerData' },
+        { $set: { data: resellerData } },
+        { upsert: true }
+      );
+      
+      return res.json({ 
+        success: true, 
+        message: `"${gamepassName}" deleted from both gamepass and reseller` 
+      });
     }
     
-    // UPDATE GAMEPASS
+    // ==================== UPDATE GAMEPASS (RENAME) ====================
     if (action === 'updateGamepass') {
       let { oldName, newName, rate, items } = req.query;
       if (req.body?.oldName) {
@@ -134,6 +215,7 @@ module.exports = async (req, res) => {
         }
       }
       
+      // Update di gamepassData
       const gamepassDoc = await collection.findOne({ type: 'gamepassData' });
       const gamepassData = gamepassDoc?.data || {};
       
@@ -148,10 +230,28 @@ module.exports = async (req, res) => {
         { upsert: true }
       );
       
-      return res.json({ success: true, message: `Updated to "${newName}"` });
+      // Update juga di resellerData dengan rate RESELLER_RATE
+      const resellerDoc = await collection.findOne({ type: 'resellerData' });
+      const resellerData = resellerDoc?.data || {};
+      
+      if (resellerData[oldName]) {
+        resellerData[newName] = { rate: RESELLER_RATE, items };
+        delete resellerData[oldName];
+      }
+      
+      await collection.updateOne(
+        { type: 'resellerData' },
+        { $set: { data: resellerData } },
+        { upsert: true }
+      );
+      
+      return res.json({ 
+        success: true, 
+        message: `Gamepass updated from "${oldName}" to "${newName}" in both collections` 
+      });
     }
     
-    // UPDATE RATES
+    // ==================== UPDATE RATES ONLY ====================
     if (action === 'updateRates') {
       let rates = req.query.rates || req.body?.rates;
       if (typeof rates === 'string') {
@@ -162,6 +262,7 @@ module.exports = async (req, res) => {
         }
       }
       
+      // Update rate di gamepassData
       const gamepassDoc = await collection.findOne({ type: 'gamepassData' });
       const gamepassData = gamepassDoc?.data || {};
       
@@ -177,13 +278,42 @@ module.exports = async (req, res) => {
         { upsert: true }
       );
       
-      return res.json({ success: true, message: 'Rates updated' });
+      // Rate di resellerData TIDAK ikut berubah (tetap 90 sesuai RESELLER_RATE)
+      // Tapi kalo mau di-sync juga, uncomment kode di bawah:
+      /*
+      const resellerDoc = await collection.findOne({ type: 'resellerData' });
+      const resellerData = resellerDoc?.data || {};
+      
+      for (const [name] of Object.entries(rates)) {
+        if (resellerData[name]) {
+          resellerData[name].rate = RESELLER_RATE; // Tetep pake rate reseller
+        }
+      }
+      
+      await collection.updateOne(
+        { type: 'resellerData' },
+        { $set: { data: resellerData } },
+        { upsert: true }
+      );
+      */
+      
+      return res.json({ 
+        success: true, 
+        message: 'Rates updated successfully (reseller rates unchanged)' 
+      });
     }
     
-    return res.json({ success: false, error: `Unknown action: ${action}` });
+    // ==================== UNKNOWN ACTION ====================
+    return res.json({ 
+      success: false, 
+      error: `Unknown action: ${action}` 
+    });
     
   } catch (error) {
     console.error('Error:', error);
-    return res.status(500).json({ success: false, error: error.message });
+    return res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
   }
 };
