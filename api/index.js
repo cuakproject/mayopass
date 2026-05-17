@@ -1,222 +1,189 @@
-const express = require('express');
-const cors = require('cors');
-const { createClient } = require('@supabase/supabase-js');
+const { MongoClient } = require('mongodb');
 
-const app = express();
+// GANTI DENGAN CONNECTION STRING DARI MONGODB ATLAS LO!
+const MONGODB_URI = 'mongodb+srv://mayocuak_db_user:mayoblox123@cluster0.efrs7os.mongodb.net/mayopass?retryWrites=true&w=majority';
+const DB_NAME = 'mayopass';
+const COLLECTION_NAME = 'gamepass_data';
 
-// === GANTI DENGAN DATA LO ===
-const SUPABASE_URL = 'https://yuutdtgzjxrzybztrwdc.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_o8wTMo0P5AVdgI3M-FprQQ_Q20jmIGZ';
-// ============================
+let cachedClient = null;
+let cachedDb = null;
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+async function connectToDatabase() {
+  if (cachedDb) return cachedDb;
+  
+  const client = new MongoClient(MONGODB_URI);
+  await client.connect();
+  const db = client.db(DB_NAME);
+  
+  cachedClient = client;
+  cachedDb = db;
+  return db;
+}
 
-app.use(cors());
-app.use(express.json());
-
-// Helper functions DENGAN API KEY
-async function getGamepassData() {
-    const { data, error } = await supabase
-        .from('gamepass_data')
-        .select('data')
-        .eq('type', 'gamepassData')
-        .single();
+module.exports = async (req, res) => {
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  const action = req.query.action || req.body?.action;
+  
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection(COLLECTION_NAME);
     
-    if (error && error.code !== 'PGRST116') {
-        console.error('Supabase error (gamepassData):', error);
-        throw error;
+    // GET DATA
+    if (action === 'getGamepassData') {
+      let gamepassDoc = await collection.findOne({ type: 'gamepassData' });
+      let resellerDoc = await collection.findOne({ type: 'resellerData' });
+      
+      // Kalo kosong, create default
+      if (!gamepassDoc) {
+        await collection.insertOne({ type: 'gamepassData', data: {} });
+        gamepassDoc = { data: {} };
+      }
+      if (!resellerDoc) {
+        await collection.insertOne({ type: 'resellerData', data: {} });
+        resellerDoc = { data: {} };
+      }
+      
+      return res.json({
+        success: true,
+        gamepassData: gamepassDoc.data || {},
+        resellerData: resellerDoc.data || {}
+      });
     }
-    return data?.data || {};
-}
-
-async function getResellerData() {
-    const { data, error } = await supabase
-        .from('gamepass_data')
-        .select('data')
-        .eq('type', 'resellerData')
-        .single();
     
-    if (error && error.code !== 'PGRST116') {
-        console.error('Supabase error (resellerData):', error);
-        throw error;
+    // SAVE DATA
+    if (action === 'saveGamepassData') {
+      let gamepassData, resellerData;
+      
+      if (req.query.data) {
+        const decoded = JSON.parse(decodeURIComponent(req.query.data));
+        gamepassData = decoded.gamepassData;
+        resellerData = decoded.resellerData;
+      } else if (req.body) {
+        gamepassData = req.body.gamepassData;
+        resellerData = req.body.resellerData;
+      }
+      
+      if (gamepassData) {
+        await collection.updateOne(
+          { type: 'gamepassData' },
+          { $set: { data: gamepassData } },
+          { upsert: true }
+        );
+      }
+      
+      if (resellerData) {
+        await collection.updateOne(
+          { type: 'resellerData' },
+          { $set: { data: resellerData } },
+          { upsert: true }
+        );
+      }
+      
+      return res.json({ success: true, message: 'Data saved successfully' });
     }
-    return data?.data || {};
-}
-
-async function saveGamepassData(gamepassData) {
-    const { error } = await supabase
-        .from('gamepass_data')
-        .update({ data: gamepassData })
-        .eq('type', 'gamepassData');
     
-    if (error) throw error;
-}
-
-async function saveResellerData(resellerData) {
-    const { error } = await supabase
-        .from('gamepass_data')
-        .update({ data: resellerData })
-        .eq('type', 'resellerData');
-    
-    if (error) throw error;
-}
-
-// API Endpoint
-app.all('/api', async (req, res) => {
-    try {
-        const action = req.query.action || req.body?.action;
-
-        if (!action) {
-            return res.status(400).json({ success: false, error: 'Action parameter is required' });
-        }
-
-        // GET DATA
-        if (action === 'getGamepassData') {
-            const gamepassData = await getGamepassData();
-            const resellerData = await getResellerData();
-            return res.json({ success: true, gamepassData, resellerData });
-        }
-
-        // SAVE DATA
-        else if (action === 'saveGamepassData') {
-            let gamepassData, resellerData;
-
-            if (req.query.data) {
-                const decoded = JSON.parse(decodeURIComponent(req.query.data));
-                gamepassData = decoded.gamepassData;
-                resellerData = decoded.resellerData;
-            } else if (req.body) {
-                gamepassData = req.body.gamepassData;
-                resellerData = req.body.resellerData;
-            }
-
-            if (!gamepassData && !resellerData) {
-                return res.json({ success: false, error: 'No data provided' });
-            }
-
-            if (gamepassData) {
-                const current = await getGamepassData();
-                Object.assign(current, gamepassData);
-                await saveGamepassData(current);
-            }
-
-            if (resellerData) {
-                await saveResellerData(resellerData);
-            }
-
-            return res.json({ success: true, message: 'Data saved successfully' });
-        }
-
-        // DELETE GAMEPASS
-        else if (action === 'deleteGamepass') {
-            const gamepassName = req.query.gamepassName || req.body?.gamepassName;
-            if (!gamepassName) {
-                return res.json({ success: false, error: 'gamepassName is required' });
-            }
-
-            const gamepassData = await getGamepassData();
-            const resellerData = await getResellerData();
-            
-            delete gamepassData[gamepassName];
-            delete resellerData[gamepassName];
-            
-            await saveGamepassData(gamepassData);
-            await saveResellerData(resellerData);
-            
-            return res.json({ success: true, message: `Gamepass "${gamepassName}" deleted successfully` });
-        }
-
-        // UPDATE GAMEPASS
-        else if (action === 'updateGamepass') {
-            let { oldName, newName, rate, items } = req.query;
-            if (req.body && req.body.oldName) {
-                ({ oldName, newName, rate, items } = req.body);
-            }
-
-            if (!oldName || !newName || !rate) {
-                return res.json({ success: false, error: 'oldName, newName, and rate are required' });
-            }
-
-            if (typeof items === 'string') {
-                try {
-                    items = JSON.parse(decodeURIComponent(items));
-                } catch (e) {
-                    try {
-                        items = JSON.parse(items);
-                    } catch (e2) {
-                        return res.json({ success: false, error: 'Invalid items format' });
-                    }
-                }
-            }
-
-            const gamepassData = await getGamepassData();
-            const resellerData = await getResellerData();
-            
-            const hasGamepass = gamepassData[oldName];
-            const hasReseller = resellerData[oldName];
-            
-            if (!hasGamepass && !hasReseller) {
-                return res.json({ success: false, error: `Gamepass "${oldName}" not found` });
-            }
-            
-            if (hasGamepass) {
-                delete gamepassData[oldName];
-                gamepassData[newName] = { rate: parseInt(rate), items };
-            }
-            
-            if (hasReseller) {
-                const resellerRate = hasGamepass ? gamepassData[newName].rate : rate;
-                delete resellerData[oldName];
-                resellerData[newName] = { rate: parseInt(resellerRate), items };
-            }
-            
-            await saveGamepassData(gamepassData);
-            await saveResellerData(resellerData);
-            
-            return res.json({ success: true, message: `Gamepass updated from "${oldName}" to "${newName}"` });
-        }
-
-        // UPDATE RATES
-        else if (action === 'updateRates') {
-            let rates = req.query.rates || req.body?.rates;
-            if (typeof rates === 'string') {
-                try {
-                    rates = JSON.parse(decodeURIComponent(rates));
-                } catch (e) {
-                    try {
-                        rates = JSON.parse(rates);
-                    } catch (e2) {
-                        return res.json({ success: false, error: 'Invalid rates format' });
-                    }
-                }
-            }
-
-            if (!rates || Object.keys(rates).length === 0) {
-                return res.json({ success: false, error: 'Rates data is required' });
-            }
-
-            const gamepassData = await getGamepassData();
-            for (const [name, newRate] of Object.entries(rates)) {
-                if (gamepassData[name]) {
-                    gamepassData[name].rate = parseInt(newRate);
-                }
-            }
-            await saveGamepassData(gamepassData);
-            
-            return res.json({ success: true, message: 'Rates updated successfully' });
-        }
-
-        else {
-            return res.json({ success: false, error: `Unknown action: ${action}` });
-        }
-    } catch (error) {
-        console.error('Server error:', error);
-        res.status(500).json({ success: false, error: 'Internal server error: ' + error.message });
+    // DELETE
+    if (action === 'deleteGamepass') {
+      const gamepassName = req.query.gamepassName || req.body?.gamepassName;
+      if (!gamepassName) {
+        return res.json({ success: false, error: 'gamepassName required' });
+      }
+      
+      const gamepassDoc = await collection.findOne({ type: 'gamepassData' });
+      const resellerDoc = await collection.findOne({ type: 'resellerData' });
+      
+      if (gamepassDoc?.data) delete gamepassDoc.data[gamepassName];
+      if (resellerDoc?.data) delete resellerDoc.data[gamepassName];
+      
+      await collection.updateOne(
+        { type: 'gamepassData' },
+        { $set: { data: gamepassDoc?.data || {} } }
+      );
+      await collection.updateOne(
+        { type: 'resellerData' },
+        { $set: { data: resellerDoc?.data || {} } }
+      );
+      
+      return res.json({ success: true, message: `"${gamepassName}" deleted` });
     }
-});
-
-app.get('/', (req, res) => {
-    res.json({ status: 'online', message: 'Mayoblox API with Supabase', timestamp: new Date().toISOString() });
-});
-
-module.exports = app;
+    
+    // UPDATE GAMEPASS
+    if (action === 'updateGamepass') {
+      let { oldName, newName, rate, items } = req.query;
+      if (req.body?.oldName) {
+        ({ oldName, newName, rate, items } = req.body);
+      }
+      
+      if (!oldName || !newName || !rate) {
+        return res.json({ success: false, error: 'oldName, newName, rate required' });
+      }
+      
+      if (typeof items === 'string') {
+        try {
+          items = JSON.parse(decodeURIComponent(items));
+        } catch (e) {
+          items = JSON.parse(items);
+        }
+      }
+      
+      const gamepassDoc = await collection.findOne({ type: 'gamepassData' });
+      const gamepassData = gamepassDoc?.data || {};
+      
+      if (gamepassData[oldName]) {
+        gamepassData[newName] = { rate: parseInt(rate), items };
+        delete gamepassData[oldName];
+      }
+      
+      await collection.updateOne(
+        { type: 'gamepassData' },
+        { $set: { data: gamepassData } },
+        { upsert: true }
+      );
+      
+      return res.json({ success: true, message: `Updated to "${newName}"` });
+    }
+    
+    // UPDATE RATES
+    if (action === 'updateRates') {
+      let rates = req.query.rates || req.body?.rates;
+      if (typeof rates === 'string') {
+        try {
+          rates = JSON.parse(decodeURIComponent(rates));
+        } catch (e) {
+          rates = JSON.parse(rates);
+        }
+      }
+      
+      const gamepassDoc = await collection.findOne({ type: 'gamepassData' });
+      const gamepassData = gamepassDoc?.data || {};
+      
+      for (const [name, newRate] of Object.entries(rates)) {
+        if (gamepassData[name]) {
+          gamepassData[name].rate = parseInt(newRate);
+        }
+      }
+      
+      await collection.updateOne(
+        { type: 'gamepassData' },
+        { $set: { data: gamepassData } },
+        { upsert: true }
+      );
+      
+      return res.json({ success: true, message: 'Rates updated' });
+    }
+    
+    return res.json({ success: false, error: `Unknown action: ${action}` });
+    
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
